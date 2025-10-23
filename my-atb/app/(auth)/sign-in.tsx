@@ -155,7 +155,7 @@ const SignIn = () => {
                         ]}
                     />
 
-                    <CustomButton title="Register" handlePress={() => {router.replace("/(auth)")}} containerStyles="mt-7 w-full bg-slate-500 rounded-xl" />
+                    <CustomButton title="Register" handlePress={() => {router.replace("/sign-up")}} containerStyles="mt-7 w-full bg-slate-500 rounded-xl" />
 
                     <CustomButton title="Login" handlePress={submit} containerStyles="mt-4 w-full bg-red-700 rounded-xl" />
 

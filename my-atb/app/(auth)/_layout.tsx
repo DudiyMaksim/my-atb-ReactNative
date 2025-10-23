@@ -19,7 +19,7 @@ const AuthLayout = () => {
                 tabBarButton: HapticTab,
             }}>
             <Tabs.Screen
-                name="index"
+                name="sign-in"
                 options={{
                     title: 'Вхід',
                     tabBarIcon: ({ color }) => <AntDesign name="login" size={28} color={color} />,

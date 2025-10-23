@@ -190,7 +190,7 @@ const SignUp = () => {
 
                     <CustomButton title="Register" handlePress={submit} containerStyles="mt-7 w-full bg-slate-500 rounded-xl" />
 
-                    <CustomButton title="Login" handlePress={() => {router.replace("/(auth)")}} containerStyles="mt-4 w-full bg-red-700 rounded-xl" />
+                    <CustomButton title="Login" handlePress={() => {router.replace("/sign-in")}} containerStyles="mt-4 w-full bg-red-700 rounded-xl" />
 
                 </View>
             </ScrollView>
