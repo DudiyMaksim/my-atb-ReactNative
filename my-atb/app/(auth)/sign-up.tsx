@@ -43,7 +43,34 @@ const SignUp = () => {
             });
             return;
         }
-        console.log("Submit form", user);
+        try {
+            const response = await fetch("http://localhost:5165/api/Account/Register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(user),
+            });
+
+            if (response.ok) {
+                showMessage({
+                    message: "Реєстрація успішна!",
+                    type: "success",
+                });
+            } else {
+                const data = await response.json();
+                showMessage({
+                    message: data.message || "Помилка при реєстрації",
+                    type: "danger",
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            showMessage({
+                message: "Не вдалося з'єднатися з сервером",
+                type: "danger",
+            });
+        }
     }
 
 

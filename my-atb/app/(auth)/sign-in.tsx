@@ -3,10 +3,9 @@ import {IUserCreate} from "@/models/account";
 import {useState} from "react";
 import {useRouter} from "expo-router";
 import {showMessage} from "react-native-flash-message";
-import {pickImage} from "@/utils/pickImage";
-import images from "@/constants/images";
 import FormField from "@/components/form-fields";
 import CustomButton from "@/components/custom-button";
+import axios from "axios";
 
 const userInitState: IUserCreate = {
     email: '',
@@ -39,7 +38,31 @@ const SignIn = () => {
             });
             return;
         }
-        console.log("Submit form", user);
+        try {
+            const response = await axios.post(
+                "http://10.0.2.2:5165/api/Account/Login",
+                {
+                    email: user.email,
+                    password: user.password,
+                }
+            );
+
+            console.log("Успішний вхід:", response.data);
+
+            showMessage({
+                message: "Вхід виконано успішно",
+                type: "success",
+            });
+
+            router.replace("/sign-in");
+
+        } catch (error: any) {
+            console.error("Помилка при вході:", error);
+            showMessage({
+                message: error.response?.data || "Помилка під час входу",
+                type: "danger",
+            });
+        }
     }
 
     return (
