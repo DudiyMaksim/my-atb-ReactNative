@@ -7,6 +7,9 @@ import CustomButton from "@/components/custom-button";
 import {pickImage} from "@/utils/pickImage";
 import {useRouter} from "expo-router";
 import { showMessage } from "react-native-flash-message";
+import {getFileFromUriAsync} from "@/utils/getFileFromUriAsync";
+import {IRegisterRequest} from "@/types/account/IRegisterRequest";
+import {useRegisterMutation} from "@/services/apiAccount";
 
 const userInitState: IUserCreate = {
     email: '',
@@ -18,6 +21,7 @@ const userInitState: IUserCreate = {
 
 
 const SignUp = () => {
+    const [register, {isLoading, error: registerError}] = useRegisterMutation();
     //Зберігає дані користувача
     const [user, setUser] = useState<IUserCreate>(userInitState);
     //Зберігає помилки
@@ -43,34 +47,33 @@ const SignUp = () => {
             });
             return;
         }
-        try {
-            const response = await fetch("http://localhost:5165/api/Account/Register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(user),
-            });
-
-            if (response.ok) {
-                showMessage({
-                    message: "Реєстрація успішна!",
-                    type: "success",
-                });
-            } else {
-                const data = await response.json();
-                showMessage({
-                    message: data.message || "Помилка при реєстрації",
-                    type: "danger",
-                });
+        if(user.imageUrl) {
+            const fileImage =
+                await getFileFromUriAsync(user.imageUrl);
+            console.log("Submit form-- file",  fileImage);
+            try {
+                const model : IRegisterRequest = {...user, imageFile: fileImage};
+                await register(model);
+                router.replace("/sign-in");
+                // const url = "https://spr311.itstep.click/api/account/register";
+                // console.log("Submit form-- model",  model);
+                // // const url = "http://10.0.2.2:5165/api/account/register";
+                // const formData = serialize(model)
+                // console.log("Submit form-- url",  url);
+                // await axios.post(url, formData,
+                //     {
+                //         headers: {
+                //             'Content-Type': 'multipart/form-data'
+                //         }
+                //     });
             }
-        } catch (error) {
-            console.error(error);
-            showMessage({
-                message: "Не вдалося з'єднатися з сервером",
-                type: "danger",
-            });
+            catch(ex) {
+                console.log("Submit form-- error", ex);
+            }
+
         }
+
+        //console.log("Submit form", user);
     }
 
 

@@ -2,9 +2,12 @@
 using Core.Constants;
 using Core.Interfaces;
 using Core.Models.Account;
+using Domain;
 using Domain.Entities.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MyAPI.Controllers;
 
@@ -52,5 +55,23 @@ public class AccountController(IJwtTokenService jwtTokenService,
                 errors = "Registration failed"
             });
         }
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> GetCurrentUser([FromServices] AppDbContext context)
+    {
+        var userEmail = User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+
+        if (userEmail == null)
+            return Unauthorized();
+
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.Email == userEmail);
+
+        if (user == null)
+            return NotFound("User not found");
+
+        return Ok(user);
     }
 }
