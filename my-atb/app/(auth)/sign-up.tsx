@@ -8,6 +8,8 @@ import {pickImage} from "@/utils/pickImage";
 import {useRouter} from "expo-router";
 import { showMessage } from "react-native-flash-message";
 import {getFileFromUriAsync} from "@/utils/getFileFromUriAsync";
+// import axios from "axios";
+// import {serialize} from 'object-to-formdata';
 import {IRegisterRequest} from "@/types/account/IRegisterRequest";
 import {useRegisterMutation} from "@/services/apiAccount";
 
@@ -21,7 +23,12 @@ const userInitState: IUserCreate = {
 
 
 const SignUp = () => {
+
     const [register, {isLoading, error: registerError}] = useRegisterMutation();
+    //Метод register - для реєстрації
+    //boolean isLoading - Для відслідковування запиту
+    //error - об'єкт, який містить помилки
+    // console.log("Register", isLoading, registerError);
     //Зберігає дані користувача
     const [user, setUser] = useState<IUserCreate>(userInitState);
     //Зберігає помилки
@@ -54,7 +61,7 @@ const SignUp = () => {
             try {
                 const model : IRegisterRequest = {...user, imageFile: fileImage};
                 await register(model);
-                router.replace("/sign-in");
+                router.replace("/(auth)/sign-in");
                 // const url = "https://spr311.itstep.click/api/account/register";
                 // console.log("Submit form-- model",  model);
                 // // const url = "http://10.0.2.2:5165/api/account/register";
@@ -220,7 +227,7 @@ const SignUp = () => {
 
                     <CustomButton title="Register" handlePress={submit} containerStyles="mt-7 w-full bg-slate-500 rounded-xl" />
 
-                    <CustomButton title="Login" handlePress={() => {router.replace("/sign-in")}} containerStyles="mt-4 w-full bg-red-700 rounded-xl" />
+                    <CustomButton title="Login" handlePress={() => {router.replace("/(auth)/sign-in")}} containerStyles="mt-4 w-full bg-red-700 rounded-xl" />
 
                 </View>
             </ScrollView>

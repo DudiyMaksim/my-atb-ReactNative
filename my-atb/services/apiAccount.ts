@@ -4,6 +4,7 @@ import {ILoginResponse} from "@/types/account/ILoginResponse";
 import {IRegisterRequest} from "@/types/account/IRegisterRequest";
 import {serialize} from "object-to-formdata";
 import {ILoginRequest} from "@/types/account/ILoginRequest";
+import {IUserProfile} from "@/types/account/IUserProfile";
 
 export const apiAccount = createApi({
     reducerPath: "apiAccount",
@@ -29,8 +30,15 @@ export const apiAccount = createApi({
                     body: data
                 }
             }
-        })
+        }),
+        profile: builder.query<IUserProfile, void>({
+            query: () => ({
+                url: "profile",
+                method: "GET"
+            }),
+            providesTags: ["Account"]
+        }),
     }),
 });
 
-export const {useRegisterMutation, useLoginMutation} = apiAccount;
+export const {useRegisterMutation, useLoginMutation, useProfileQuery} = apiAccount;

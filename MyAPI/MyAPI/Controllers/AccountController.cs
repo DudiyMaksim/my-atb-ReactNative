@@ -2,20 +2,19 @@
 using Core.Constants;
 using Core.Interfaces;
 using Core.Models.Account;
-using Domain;
 using Domain.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 namespace MyAPI.Controllers;
 
 [Route("api/[controller]/[action]")]
 [ApiController]
 public class AccountController(IJwtTokenService jwtTokenService,
         IMapper mapper, IImageService imageService,
-        UserManager<UserEntity> userManager) : ControllerBase
+        UserManager<UserEntity> userManager,
+        IUserService userService,
+        IAuthService authService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -30,8 +29,10 @@ public class AccountController(IJwtTokenService jwtTokenService,
     }
 
     [HttpPost]
+    //[Authorize(Roles=$"{Roles.Admin}")]
     public async Task<IActionResult> Register([FromForm] RegisterModel model)
     {
+        var request = Request;
         var user = mapper.Map<UserEntity>(model);
 
         user.Image = await imageService.SaveImageAsync(model.ImageFile!);
@@ -52,26 +53,17 @@ public class AccountController(IJwtTokenService jwtTokenService,
             {
                 status = 400,
                 isValid = false,
-                errors = "Registration failed"
+                errors = result.Errors.ToList()
             });
         }
     }
 
-    [HttpGet("me")]
+    [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetCurrentUser([FromServices] AppDbContext context)
+    public async Task<IActionResult> Profile()
     {
-        var userEmail = User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
-
-        if (userEmail == null)
-            return Unauthorized();
-
-        var user = await context.Users
-            .FirstOrDefaultAsync(u => u.Email == userEmail);
-
-        if (user == null)
-            return NotFound("User not found");
-
-        return Ok(user);
+        var userId = await authService.GetUserIdAsync();
+        var userInfo = await userService.GetUserByIdAsync(userId);
+        return Ok(userInfo);
     }
 }
